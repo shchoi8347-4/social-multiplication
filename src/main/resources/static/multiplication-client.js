@@ -1,3 +1,4 @@
+// 곱셈 문제 하나를 요청해서 받은 후, 곱할 두 숫자를 보여주는 함수 
 function updateMultiplication() {
   $.ajax({
     url: "http://localhost:8080/multiplications/random"
@@ -13,7 +14,7 @@ function updateMultiplication() {
 
 $(document).ready(function () {
 
-  updateMultiplication();
+  updateMultiplication(); // 곱할 두 숫자를 보여줌
 
   $("#attempt-form").submit(function (event) {
 
@@ -27,7 +28,7 @@ $(document).ready(function () {
       attempt = $form.find("input[name='result-attempt']").val(),
       userAlias = $form.find("input[name='user-alias']").val();
 
-    // API 에 맞게 데이터를 조합하기
+    // API 에 맞게 데이터를 조합하기(MultiplicationResultAttempt 객체를 만듦)
     var data = {user: {alias: userAlias}, multiplication: {factorA: a, factorB: b}, resultAttempt: attempt};
 
     // POST를 이용해서 데이터 보내기
