@@ -1,16 +1,12 @@
 package microservices.book.multiplication.controller;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import microservices.book.multiplication.domain.MultiplicationResultAttempt;
 import microservices.book.multiplication.service.MultiplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 사용자가 POST 로 답안을 전송하도록 REST API 를 제공하는 클래스
@@ -27,16 +23,24 @@ final class MultiplicationResultAttemptController {
   }
 
   @PostMapping
-  ResponseEntity<ResultResponse> postResult(@RequestBody MultiplicationResultAttempt multiplicationResultAttempt) {
-    return ResponseEntity.ok(
-            new ResultResponse(multiplicationService
-                    .checkAttempt(multiplicationResultAttempt)));
+  ResponseEntity<MultiplicationResultAttempt> postResult(@RequestBody MultiplicationResultAttempt multiplicationResultAttempt) {
+	// 채점
+    boolean isCorrect = multiplicationService.checkAttempt(multiplicationResultAttempt);
+    // 답안 복사본 생성
+    MultiplicationResultAttempt attemptCopy = new MultiplicationResultAttempt(
+            multiplicationResultAttempt.getUser(),
+            multiplicationResultAttempt.getMultiplication(),
+            multiplicationResultAttempt.getResultAttempt(),
+            isCorrect // 채점 결과
+    );
+    return ResponseEntity.ok(attemptCopy);
   }
 
-  @RequiredArgsConstructor
-  @NoArgsConstructor(force = true)
-  @Getter
-  static final class ResultResponse {
-    private final boolean correct;
+  @GetMapping
+  ResponseEntity<List<MultiplicationResultAttempt>> getStatistics(@RequestParam("alias") String alias) {
+    return ResponseEntity.ok(
+            multiplicationService.getStatsForUser(alias)
+    );
   }
+
 }

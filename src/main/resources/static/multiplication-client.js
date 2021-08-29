@@ -1,4 +1,3 @@
-// 곱셈 문제 하나를 요청해서 받은 후, 곱할 두 숫자를 보여주는 함수 
 function updateMultiplication() {
   $.ajax({
     url: "http://localhost:8080/multiplications/random"
@@ -12,9 +11,24 @@ function updateMultiplication() {
   });
 }
 
+// 현재 사용자의 이전 답안들을 출력하는 함수
+function updateStats(alias) {
+  $.ajax({
+    url: "http://localhost:8080/results?alias=" + alias,
+  }).then(function (data) {  // 요청 결과가 data에 담김
+    $('#stats-body').empty(); // 표의 현재 내용을 지움
+    data.forEach(function (row) { // 표를 예전 답안 정보로 채움
+      $('#stats-body').append('<tr><td>' + row.id + '</td>' +
+        '<td>' + row.multiplication.factorA + ' x ' + row.multiplication.factorB + '</td>' +
+        '<td>' + row.resultAttempt + '</td>' +
+        '<td>' + (row.correct === true ? 'YES' : 'NO') + '</td></tr>');
+    });
+  });
+}
+
 $(document).ready(function () {
 
-  updateMultiplication(); // 곱할 두 숫자를 보여줌
+  updateMultiplication();
 
   $("#attempt-form").submit(function (event) {
 
@@ -28,16 +42,17 @@ $(document).ready(function () {
       attempt = $form.find("input[name='result-attempt']").val(),
       userAlias = $form.find("input[name='user-alias']").val();
 
-    // API 에 맞게 데이터를 조합하기(MultiplicationResultAttempt 객체를 만듦)
+    // API에 맞게 데이터를 조합하기
     var data = {user: {alias: userAlias}, multiplication: {factorA: a, factorB: b}, resultAttempt: attempt};
 
-    // POST를 이용해서 데이터 보내기
+    // POST 를 이용해서 데이터 보내기
     $.ajax({
       url: '/results',
       type: 'POST',
       data: JSON.stringify(data),
       contentType: "application/json; charset=utf-8",
       dataType: "json",
+      async: false,
       success: function (result) {
         if (result.correct) {
           $('.result-message').empty().append("정답입니다! 축하드려요!");
@@ -48,5 +63,7 @@ $(document).ready(function () {
     });
 
     updateMultiplication();
+
+    updateStats(userAlias);
   });
 });
