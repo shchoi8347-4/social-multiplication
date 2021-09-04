@@ -7,8 +7,6 @@ import lombok.ToString;
 
 import javax.persistence.*;
 
-
-
 /**
  * {@link User}가 {@link Multiplication}을 계산한 답안을 정의한 클래스
  */
@@ -23,11 +21,11 @@ public final class MultiplicationResultAttempt {
   @GeneratedValue
   private Long id;
 
-  @ManyToOne(cascade = CascadeType.PERSIST) // MultiplicationResultAttempt 객체 저장시, User 객체도 자동으로 저장됨
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "USER_ID")
   private final User user;
 
-  @ManyToOne(cascade = CascadeType.PERSIST) // MultiplicationResultAttempt 객체 저장시, Multiplication 객체도 자동으로 저장됨
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "MULTIPLICATION_ID")
   private final Multiplication multiplication;
   private final int resultAttempt;

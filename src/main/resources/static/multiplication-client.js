@@ -11,13 +11,12 @@ function updateMultiplication() {
   });
 }
 
-// 현재 사용자의 이전 답안들을 출력하는 함수
 function updateStats(alias) {
   $.ajax({
     url: "http://localhost:8080/results?alias=" + alias,
-  }).then(function (data) {  // 요청 결과가 data에 담김
-    $('#stats-body').empty(); // 표의 현재 내용을 지움
-    data.forEach(function (row) { // 표를 예전 답안 정보로 채움
+  }).then(function (data) {
+    $('#stats-body').empty();
+    data.forEach(function (row) {
       $('#stats-body').append('<tr><td>' + row.id + '</td>' +
         '<td>' + row.multiplication.factorA + ' x ' + row.multiplication.factorB + '</td>' +
         '<td>' + row.resultAttempt + '</td>' +
@@ -42,10 +41,10 @@ $(document).ready(function () {
       attempt = $form.find("input[name='result-attempt']").val(),
       userAlias = $form.find("input[name='user-alias']").val();
 
-    // API에 맞게 데이터를 조합하기
+    // API 에 맞게 데이터를 조합하기
     var data = {user: {alias: userAlias}, multiplication: {factorA: a, factorB: b}, resultAttempt: attempt};
 
-    // POST 를 이용해서 데이터 보내기
+    // POST 로 데이터 보내기
     $.ajax({
       url: '/results',
       type: 'POST',

@@ -24,22 +24,27 @@ final class MultiplicationResultAttemptController {
 
   @PostMapping
   ResponseEntity<MultiplicationResultAttempt> postResult(@RequestBody MultiplicationResultAttempt multiplicationResultAttempt) {
-	// 채점
     boolean isCorrect = multiplicationService.checkAttempt(multiplicationResultAttempt);
-    // 답안 복사본 생성
     MultiplicationResultAttempt attemptCopy = new MultiplicationResultAttempt(
             multiplicationResultAttempt.getUser(),
             multiplicationResultAttempt.getMultiplication(),
             multiplicationResultAttempt.getResultAttempt(),
-            isCorrect // 채점 결과
+            isCorrect
     );
     return ResponseEntity.ok(attemptCopy);
   }
 
   @GetMapping
   ResponseEntity<List<MultiplicationResultAttempt>> getStatistics(@RequestParam("alias") String alias) {
-    return ResponseEntity.ok(
+    return ResponseEntity.ok( // 응답 상태를 OK로 설정
             multiplicationService.getStatsForUser(alias)
+    );
+  }
+
+  @GetMapping("/{resultId}")
+  ResponseEntity<MultiplicationResultAttempt> getResultById(final @PathVariable("resultId") Long resultId) {
+    return ResponseEntity.ok(
+            multiplicationService.getResultById(resultId)  // 답안 객체를 반환함
     );
   }
 

@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>microservices.book</groupId>
-    <artifactId>social-multiplication-v4</artifactId>
-    <version>0.4.0-SNAPSHOT</version>
+    <artifactId>social-multiplication-v5</artifactId>
+    <version>0.5.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>social-multiplication-v4</name>
+    <name>social-multiplication-v5</name>
     <description>소셜 곱셈 애플리케이션 (도서 스프링 부트로 배우는 마이크로서비스)</description>
 
     <parent>
@@ -30,6 +30,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -48,18 +53,41 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
-  
-<dependency>
-    <groupId>javax.xml.bind</groupId>
-    <artifactId>jaxb-api</artifactId>
-    <version>2.3.0</version>
-</dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--  
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+            <scope>test</scope>
+        </dependency>      
+        -->
+        
+<!-- 96페이지 예졔4.1 코드 대신에 아래 문장 삽입할 것 -->
+  <!--
+<dependency>
+  <groupId>org.springframework.amqp</groupId>
+  <artifactId>spring-rabbit</artifactId>
+  <version>2.3.10</version>
+</dependency>
+-->
+<dependency>
+    <groupId>javax.xml.bind</groupId>
+     <artifactId>jaxb-api</artifactId>
+    <version>2.3.0</version>
+ </dependency>
+ 
+ <!-- https://mvnrepository.com/artifact/org.springframework.retry/spring-retry -->
+<dependency>
+    <groupId>org.springframework.retry</groupId>
+    <artifactId>spring-retry</artifactId>
+    <version>1.3.1</version>
+</dependency>
+
     </dependencies>
 
     <build>
@@ -70,6 +98,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>

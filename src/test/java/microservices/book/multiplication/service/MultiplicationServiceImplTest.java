@@ -3,6 +3,8 @@ package microservices.book.multiplication.service;
 import microservices.book.multiplication.domain.Multiplication;
 import microservices.book.multiplication.domain.MultiplicationResultAttempt;
 import microservices.book.multiplication.domain.User;
+import microservices.book.multiplication.event.EventDispatcher;
+import microservices.book.multiplication.event.MultiplicationSolvedEvent;
 import microservices.book.multiplication.repository.MultiplicationResultAttemptRepository;
 import microservices.book.multiplication.repository.UserRepository;
 import org.assertj.core.util.Lists;
@@ -16,6 +18,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 public class MultiplicationServiceImplTest {
@@ -31,11 +34,15 @@ public class MultiplicationServiceImplTest {
   @Mock
   private UserRepository userRepository;
 
+  @Mock
+  private EventDispatcher eventDispatcher; // 이벤트 디스패처
+
   @Before
   public void setUp() {
     // initMocks 를 호출해 Mockito 가 어노테이션을 처리하도록 지시
     MockitoAnnotations.initMocks(this);
-    multiplicationServiceImpl = new MultiplicationServiceImpl(randomGeneratorService, attemptRepository, userRepository);
+    multiplicationServiceImpl = new MultiplicationServiceImpl(randomGeneratorService, attemptRepository,
+            userRepository, eventDispatcher);
   }
 
   @Test
@@ -57,17 +64,21 @@ public class MultiplicationServiceImplTest {
     Multiplication multiplication = new Multiplication(50, 60);
     User user = new User("john_doe");
     MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(
-            user, multiplication, 3000, false); // 정답 3000을 전달함, 채점 전에는 항상 false이어야 함(아직 채점 안 했음을 의미함)
+            user, multiplication, 3000, false);
     MultiplicationResultAttempt verifiedAttempt = new MultiplicationResultAttempt(
-            user, multiplication, 3000, true); // 채점 후 답안 객체
-    given(userRepository.findByAlias("john_doe")).willReturn(Optional.empty()); // 빈(사용자 없는) Optional 객체를 리턴함
+            user, multiplication, 3000, true);
+    // 이벤트 객체 생성
+    MultiplicationSolvedEvent event = new MultiplicationSolvedEvent(attempt.getId(),
+            attempt.getUser().getId(), true);
+    given(userRepository.findByAlias("john_doe")).willReturn(Optional.empty());
 
     // when
-    boolean attemptResult = multiplicationServiceImpl.checkAttempt(attempt); // 채점
+    boolean attemptResult = multiplicationServiceImpl.checkAttempt(attempt);
 
     // then
-    assertThat(attemptResult).isTrue(); // 정답으로 채점되었는지 확인함
-    verify(attemptRepository).save(verifiedAttempt); // 채점된  답안을 저장함
+    assertThat(attemptResult).isTrue();
+    verify(attemptRepository).save(verifiedAttempt);
+    verify(eventDispatcher).send(eq(event)); // 디스패처를 이용해서 이벤트 전송함
   }
 
   @Test
@@ -76,15 +87,19 @@ public class MultiplicationServiceImplTest {
     Multiplication multiplication = new Multiplication(50, 60);
     User user = new User("john_doe");
     MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(
-            user, multiplication, 3010, false); // 오답 3010을 전달함
-    given(userRepository.findByAlias("john_doe")).willReturn(Optional.empty()); // 빈(사용자 없는) Optional 객체를 리턴함
+            user, multiplication, 3010, false);
+    // 이벤트 객체 생성
+    MultiplicationSolvedEvent event = new MultiplicationSolvedEvent(attempt.getId(),
+            attempt.getUser().getId(), false);
+    given(userRepository.findByAlias("john_doe")).willReturn(Optional.empty());
 
     // when
     boolean attemptResult = multiplicationServiceImpl.checkAttempt(attempt);
 
     // then
-    assertThat(attemptResult).isFalse(); // 오답으로 채점되었는지 확인함
-    verify(attemptRepository).save(attempt); // 채점된 답안을 저장함
+    assertThat(attemptResult).isFalse();
+    verify(attemptRepository).save(attempt);
+    verify(eventDispatcher).send(eq(event)); // 디스패처를 이용해서 이벤트 전송함
   }
 
   @Test
@@ -97,7 +112,6 @@ public class MultiplicationServiceImplTest {
     MultiplicationResultAttempt attempt2 = new MultiplicationResultAttempt(
             user, multiplication, 3051, false);
     List<MultiplicationResultAttempt> latestAttempts = Lists.newArrayList(attempt1, attempt2);
-    
     given(userRepository.findByAlias("john_doe")).willReturn(Optional.empty());
     given(attemptRepository.findTop5ByUserAliasOrderByIdDesc("john_doe"))
             .willReturn(latestAttempts);
