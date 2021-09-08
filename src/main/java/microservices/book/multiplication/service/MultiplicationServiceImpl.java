@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import jdk.internal.org.jline.utils.Log;
+//import jdk.internal.org.jline.utils.Log;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.transaction.Transactional;
@@ -48,7 +48,7 @@ class MultiplicationServiceImpl implements MultiplicationService {
   @Transactional // 이 메소드 실행 시 예외가 발생하면 이벤트 전송이 안 되게 함
   @Override
   public boolean checkAttempt(final MultiplicationResultAttempt attempt) {
-    // 해당 닉네임의 사용자가 존재하는지 확인
+    // 해당 닉네임의 사용자가 존재하는지 확인함
     Optional<User> user = userRepository.findByAlias(attempt.getUser().getAlias());
 
     // 조작된 답안을 방지
@@ -79,6 +79,7 @@ class MultiplicationServiceImpl implements MultiplicationService {
 
     return isCorrect;
   }
+
 
   @Override
   public List<MultiplicationResultAttempt> getStatsForUser(final String userAlias) {

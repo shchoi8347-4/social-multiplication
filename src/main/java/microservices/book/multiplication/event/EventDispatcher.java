@@ -5,10 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
+
 /**
  * 이벤트 버스와의 통신을 처리
  */
 @Component
+@Slf4j
 public class EventDispatcher {
 
   private RabbitTemplate rabbitTemplate;
@@ -24,14 +28,24 @@ public class EventDispatcher {
                   @Value("${multiplication.exchange}") final String multiplicationExchange,
                   @Value("${multiplication.solved.key}") final String multiplicationSolvedRoutingKey) {
     this.rabbitTemplate = rabbitTemplate;
+    
+    
     this.multiplicationExchange = multiplicationExchange;
     this.multiplicationSolvedRoutingKey = multiplicationSolvedRoutingKey;
   }
 
   public void send(final MultiplicationSolvedEvent multiplicationSolvedEvent) {
+	  log.info("csh: starting send( ) ");
     rabbitTemplate.convertAndSend(
             multiplicationExchange,
             multiplicationSolvedRoutingKey,
-            multiplicationSolvedEvent);
+            multiplicationSolvedEvent //,
+            /*
+            msg -> {
+                msg.getMessageProperties().setContentType("application/json");
+                return msg;
+         } */
+         );
+	  log.info("csh: ending send( ) ");
   }
 }

@@ -28,7 +28,8 @@ public final class User {
   private final String alias;
 
   // JSON/JPA 를 위한 빈 생성자
-  protected User() {
-    alias = null;
+  protected User() {     
+	  alias = null; 
   }
+
 }

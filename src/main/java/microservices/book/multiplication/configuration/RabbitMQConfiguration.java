@@ -1,9 +1,11 @@
 package microservices.book.multiplication.configuration;
 
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConversionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +32,15 @@ public class RabbitMQConfiguration {
 
   @Bean
   public Jackson2JsonMessageConverter producerJackson2MessageConverter() {
-    return new Jackson2JsonMessageConverter();
+	  return new Jackson2JsonMessageConverter( );
+	  /*
+    return new Jackson2JsonMessageConverter( ) {
+    	public Object fromMessage(Message message) throws MessageConversionException {
+    	    message.getMessageProperties().setContentType("application/json");
+    	    return super.fromMessage(message);
+    	}
+    };
+    */
   }
 
 }
